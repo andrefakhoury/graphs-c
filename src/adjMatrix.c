@@ -3,14 +3,17 @@
 #include <stdbool.h>
 #include <string.h>
 
+/** Macro for an empty element of the matrix */
 #define EMPTY 0
 
+/** Struct of a graph with adjacency Matrix */
 struct Graph {
 	void*** mat;
 	size_t nVertex;
 	bool directed;
 };
 
+/** Create and return a graph with nVertex vertex. */
 Graph* graph_create(size_t nVertex, bool directed, Error* error) {
 	Graph* g = malloc(sizeof(Graph));
 	if (g == NULL) {
@@ -46,6 +49,7 @@ Graph* graph_create(size_t nVertex, bool directed, Error* error) {
 	return g;
 }
 
+/** Free the memory usage of the graph */
 void graph_destroy(Graph* g, Error* error) {
 	if (g != NULL) {
 		if (g->mat != NULL) {
@@ -58,10 +62,11 @@ void graph_destroy(Graph* g, Error* error) {
 	}
 }
 
+/** Returns a copy of the graph g */
 Graph* graph_copy(Graph* g, Error* error) {
 	if (g == NULL) {
 		error->occurred = true;
-		strcpy(error->msg, "The original graph is NULL.");
+		strcpy(error->msg, "The original graph is null.");
 		return NULL;
 	}
 
@@ -114,6 +119,7 @@ void graph_removeEdge(Graph* g, int u, int v, Error* error) {
 	}	
 }
 
+/** Returns the degree of a vertex */
 int graph_degreeOfVertex(Graph* g, int u, Error* error) {
 	if (u >= g->nVertex) {
 		error->occurred = true;
@@ -132,6 +138,7 @@ int graph_degreeOfVertex(Graph* g, int u, Error* error) {
 	return degree;
 }
 
+/** Returns the next vertex adjacent to u, in range [first, nVertex) */
 int graph_nextAdj(Graph* g, int u, int first, Error* error) {
 	if (u >= g->nVertex || first >= g->nVertex) {
 		error->occurred = true;
@@ -149,16 +156,18 @@ int graph_nextAdj(Graph* g, int u, int first, Error* error) {
 	return 0;
 }
 
-void dfs(Graph* g, int u, bool* vis) {
+/** Depth-First search on the graph. */
+void graph_dfs(Graph* g, int u, bool* vis) {
 	vis[u] = true;
 
 	for (int v = 0; v < g->nVertex; v++) {
 		if (g->mat[u][v] != EMPTY && vis[v] == false) {
-			dfs(g, v, vis);
+			graph_dfs(g, v, vis);
 		}
 	}
 }
 
+/** Returns whether an edge u-v is a bridge. */
 bool graph_isBridge(Graph* g, int u, int v, Error* error) {
 	void* old = g->mat[u][v];
 
@@ -177,7 +186,7 @@ bool graph_isBridge(Graph* g, int u, int v, Error* error) {
 			break;
 	}
 
-	dfs(g, start, vis);
+	graph_dfs(g, start, vis);
 
 	for (int i = 0; i < g->nVertex; i++) {
 		if (graph_degreeOfVertex(g, i, error) != 0 && !vis[i]) {
@@ -195,6 +204,7 @@ bool graph_isBridge(Graph* g, int u, int v, Error* error) {
 	return ans;
 }
 
+/** Returns the number of edges on a graph */
 int graph_qttEdges(Graph* g, Error* error) {
 	if (g == NULL) {
 		error->occurred = true;
@@ -216,7 +226,8 @@ int graph_qttEdges(Graph* g, Error* error) {
 	return ans;
 }
 
-void graph_innerEuler(Graph* g, int u, int** circuit, int* circuitSize, Error* error) {
+/** Executes the fleury algorithm to find the Eulerian Circuit of a graph. */
+void graph_fleury(Graph* g, int u, int** circuit, int* circuitSize, Error* error) {
 
 	int v = -1;
 
@@ -242,10 +253,10 @@ void graph_innerEuler(Graph* g, int u, int** circuit, int* circuitSize, Error* e
 
 
 	if (graph_qttEdges(g, error) > 0)
-		graph_innerEuler(g, v, circuit, circuitSize, error);
+		graph_fleury(g, v, circuit, circuitSize, error);
 }
 
-/** Returns the eulerian circuit if possible, and NULL otherwise. */
+/** Checks and fill the eulerian circuit if possible. */
 void graph_eulerianCircuit(Graph* g, int** circuit, int* circuitSize, Error* error) {
 	if (g->directed) {
 		error->occurred = true;
@@ -282,7 +293,7 @@ void graph_eulerianCircuit(Graph* g, int** circuit, int* circuitSize, Error* err
 	*circuit = realloc(*circuit, (*circuitSize) * sizeof(int));
 	((*circuit)[(*circuitSize)-1]) = v1;
 
-	graph_innerEuler(g2, v1, circuit, circuitSize, error);
+	graph_fleury(g2, v1, circuit, circuitSize, error);
 
 	graph_destroy(g2, error);
 }
