@@ -1,8 +1,8 @@
-// o que eu vou precisar fazer
 #ifndef GRAPH_H
 #define GRAPH_H
 
 #include "error.h"
+#include <stdbool.h>
 #include <stddef.h>
 
 typedef struct Graph Graph;
@@ -29,7 +29,7 @@ int graph_degreeOfVertex(Graph* g, int u, Error* error);
 int graph_nextAdj(Graph* g, int u, int first, Error* error);
 
 /** Returns whether an edge u-v is a bridge. */
-bool graph_isBridge(Graph* g, int u, int v, Error* error)
+bool graph_isBridge(Graph* g, int u, int v, Error* error);
 
 /** Returns the number of edges on a graph */
 int graph_qttEdges(Graph* g, Error* error);

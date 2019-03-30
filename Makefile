@@ -1,5 +1,5 @@
 all:
-	gcc src/*.c -I include/ -o main -Wall -std=c99 -g
+	gcc src/*.c -I include/ -o main -std=c99 -g
 
 run:
 	./main
