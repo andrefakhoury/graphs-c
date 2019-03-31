@@ -3,18 +3,20 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <stdio.h>
+
 /** Macro for an empty element of the matrix */
-#define EMPTY 0
+#define EMPTY NULL
 
 /** Struct of a graph with adjacency Matrix */
 struct Graph {
 	void*** mat;
-	size_t nVertex;
+	size_t nVertex, elemSize;
 	bool directed;
 };
 
 /** Create and return a graph with nVertex vertex. */
-Graph* graph_create(size_t nVertex, bool directed, Error* error) {
+Graph* graph_create(size_t nVertex, size_t elemSize, bool directed, Error* error) {
 	Graph* g = malloc(sizeof(Graph));
 	if (g == NULL) {
 		error->occurred = true;
@@ -24,6 +26,7 @@ Graph* graph_create(size_t nVertex, bool directed, Error* error) {
 
 	g->nVertex = nVertex;
 	g->directed = directed;
+	g->elemSize = elemSize;
 
 	g->mat = malloc(nVertex * sizeof(void**));
 	if (g->mat == NULL) {
@@ -54,6 +57,12 @@ void graph_destroy(Graph* g, Error* error) {
 	if (g != NULL) {
 		if (g->mat != NULL) {
 			for (int i = 0; i < g->nVertex; i++) {
+				if (g->mat[i] != NULL) {
+					for (int j = 0; j < g->nVertex; j++) {
+						if (g->mat[i][j] != EMPTY)
+							free(g->mat[i][j]);
+					}
+				}
 				free(g->mat[i]);
 			}
 			free(g->mat);
@@ -70,17 +79,21 @@ Graph* graph_copy(Graph* g, Error* error) {
 		return NULL;
 	}
 
-	Graph* r = graph_create(g->nVertex, g->directed, error);
+	Graph* r = graph_create(g->nVertex, g->elemSize, g->directed, error);
 	if (error->occurred) {
 		return NULL;
 	}
 
+	r->elemSize = g->elemSize;
 	r->nVertex = g->nVertex;
 	r->directed = g->directed;
 
 	for (int u = 0; u < g->nVertex; u++) {
 		for (int v = 0; v < g->nVertex; v++) {
-			r->mat[u][v] = g->mat[u][v];
+			if (g->mat[u][v] != NULL) {
+				r->mat[u][v] = malloc(r->elemSize);
+				memcpy(r->mat[u][v], g->mat[u][v], r->elemSize);
+			}
 		}
 	}
 
@@ -97,9 +110,18 @@ void graph_addEdge(Graph* g, int u, int v, void* w, Error* error) {
 
 	error->occurred = false;
 
-	g->mat[u][v] = w;
+	if (g->mat[u][v] != EMPTY) {
+		graph_removeEdge(g, u, v, error);
+	}
+
+	// printf("Size: %lu\n", g->elemSize);
+
+	g->mat[u][v] = malloc(g->elemSize);
+	memcpy(g->mat[u][v], w, g->elemSize);
+
 	if (!g->directed) {
-		g->mat[v][u] = w;
+		g->mat[v][u] = malloc(g->elemSize);
+		memcpy(g->mat[v][u], w, g->elemSize);
 	}
 }
 
@@ -113,8 +135,10 @@ void graph_removeEdge(Graph* g, int u, int v, Error* error) {
 
 	error->occurred = false;
 
+	free(g->mat[u][v]);
 	g->mat[u][v] = EMPTY;
 	if (!g->directed) {
+		free(g->mat[v][u]);
 		g->mat[v][u] = EMPTY;
 	}	
 }
@@ -297,3 +321,5 @@ void graph_eulerianCircuit(Graph* g, int** circuit, int* circuitSize, Error* err
 
 	graph_destroy(g2, error);
 }
+
+

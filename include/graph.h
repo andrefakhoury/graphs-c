@@ -8,7 +8,7 @@
 typedef struct Graph Graph;
 
 /** Create and return a graph with nVertex vertex. */
-Graph* graph_create(size_t nVertex, bool directed, Error* error);
+Graph* graph_create(size_t nVertex, size_t elemSize, bool directed, Error* error);
 
 /** Free the memory usage of the graph */
 void graph_destroy(Graph* g, Error* error);
