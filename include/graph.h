@@ -37,4 +37,7 @@ int graph_qttEdges(Graph* g, Error* error);
 /** Checks and fill the eulerian circuit if possible. */
 void graph_eulerianCircuit(Graph* g, int** circuit, int* circuitSize, Error* error);
 
+/** Returns a pointer to the weight of the edge u->v. */
+void* graph_edgeWeight(Graph* g, int u, int v, Error* error);
+
 #endif

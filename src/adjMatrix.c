@@ -114,8 +114,6 @@ void graph_addEdge(Graph* g, int u, int v, void* w, Error* error) {
 		graph_removeEdge(g, u, v, error);
 	}
 
-	// printf("Size: %lu\n", g->elemSize);
-
 	g->mat[u][v] = malloc(g->elemSize);
 	memcpy(g->mat[u][v], w, g->elemSize);
 
@@ -135,9 +133,12 @@ void graph_removeEdge(Graph* g, int u, int v, Error* error) {
 
 	error->occurred = false;
 
-	free(g->mat[u][v]);
-	g->mat[u][v] = EMPTY;
-	if (!g->directed) {
+	if (g->mat[u][v] != EMPTY) {
+		free(g->mat[u][v]);
+		g->mat[u][v] = EMPTY;
+	}
+
+	if (!g->directed && g->mat[v][u] != EMPTY) {
 		free(g->mat[v][u]);
 		g->mat[v][u] = EMPTY;
 	}	
@@ -193,37 +194,39 @@ void graph_dfs(Graph* g, int u, bool* vis) {
 
 /** Returns whether an edge u-v is a bridge. */
 bool graph_isBridge(Graph* g, int u, int v, Error* error) {
-	void* old = g->mat[u][v];
+	//creates a temporary copy of the graph
+	Graph* r = graph_copy(g, error);
+	if (error->occurred) {
+		return false;
+	}
 
-	graph_removeEdge(g, u, v, error);
-	if (!g->directed) {
-		graph_removeEdge(g, v, u, error);
+	graph_removeEdge(r, u, v, error);
+	if (!r->directed) {
+		graph_removeEdge(r, v, u, error);
 	}
 
 	bool ans = false;
 
-	bool* vis = calloc(g->nVertex, sizeof(bool));
+	bool* vis = calloc(r->nVertex, sizeof(bool));
 
 	int start = 0;
-	for (; start < g->nVertex; start++) {
-		if (graph_degreeOfVertex(g, start, error) != 0)
+	for (; start < r->nVertex; start++) {
+		if (graph_degreeOfVertex(r, start, error) != 0)
 			break;
 	}
 
-	graph_dfs(g, start, vis);
+	graph_dfs(r, start, vis);
 
-	for (int i = 0; i < g->nVertex; i++) {
-		if (graph_degreeOfVertex(g, i, error) != 0 && !vis[i]) {
+	for (int i = 0; i < r->nVertex; i++) {
+		if (graph_degreeOfVertex(r, i, error) != 0 && !vis[i]) {
 			ans = true;
 		}
 	}
 
+
 	free(vis);
 
-	graph_addEdge(g, u, v, old, error);
-	if (!g->directed) {
-		graph_addEdge(g, v, u, old, error);
-	}
+	graph_destroy(r, error);
 
 	return ans;
 }
@@ -294,6 +297,10 @@ void graph_eulerianCircuit(Graph* g, int** circuit, int* circuitSize, Error* err
 	Graph* g2 = graph_copy(g, error);
 	if (error->occurred) {
 		graph_destroy(g2, error);
+
+		error->occurred = true;
+		strcpy(error->msg, "Error on creating a copy of the graph");
+
 		*circuit = NULL;
 		*circuitSize = 0;
 		return;
@@ -322,4 +329,19 @@ void graph_eulerianCircuit(Graph* g, int** circuit, int* circuitSize, Error* err
 	graph_destroy(g2, error);
 }
 
+/** Returns a pointer to the weight of the edge u->v. */
+void* graph_edgeWeight(Graph* g, int u, int v, Error* error) {
+	if (g == NULL) {
+		error->occurred = true;
+		strcpy(error->msg, "Given graph is null.");
+		return NULL;
+	}
 
+	if (u >= g->nVertex || v >= g->nVertex) {
+		error->occurred = true;
+		strcpy(error->msg, "Invalid vertex number.");
+		return NULL;
+	}
+
+	return g->mat[u][v];
+}
