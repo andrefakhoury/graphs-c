@@ -3,8 +3,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include <stdio.h>
-
 /** Macro for an empty element of the matrix */
 #define EMPTY NULL
 
@@ -194,31 +192,28 @@ void graph_dfs(Graph* g, int u, bool* vis) {
 
 /** Returns whether an edge u-v is a bridge. */
 bool graph_isBridge(Graph* g, int u, int v, Error* error) {
-	//creates a temporary copy of the graph
-	Graph* r = graph_copy(g, error);
-	if (error->occurred) {
-		return false;
-	}
+	void* old = malloc(g->elemSize);
+	memcpy(old, g->mat[u][v], g->elemSize);
 
-	graph_removeEdge(r, u, v, error);
-	if (!r->directed) {
-		graph_removeEdge(r, v, u, error);
+	graph_removeEdge(g, u, v, error);
+	if (!g->directed) {
+		graph_removeEdge(g, v, u, error);
 	}
 
 	bool ans = false;
 
-	bool* vis = calloc(r->nVertex, sizeof(bool));
+	bool* vis = calloc(g->nVertex, sizeof(bool));
 
 	int start = 0;
-	for (; start < r->nVertex; start++) {
-		if (graph_degreeOfVertex(r, start, error) != 0)
+	for (; start < g->nVertex; start++) {
+		if (graph_degreeOfVertex(g, start, error) != 0)
 			break;
 	}
 
-	graph_dfs(r, start, vis);
+	graph_dfs(g, start, vis);
 
-	for (int i = 0; i < r->nVertex; i++) {
-		if (graph_degreeOfVertex(r, i, error) != 0 && !vis[i]) {
+	for (int i = 0; i < g->nVertex; i++) {
+		if (graph_degreeOfVertex(g, i, error) != 0 && !vis[i]) {
 			ans = true;
 		}
 	}
@@ -226,7 +221,10 @@ bool graph_isBridge(Graph* g, int u, int v, Error* error) {
 
 	free(vis);
 
-	graph_destroy(r, error);
+	graph_addEdge(g, u, v, old, error);
+	graph_addEdge(g, v, u, old, error);
+
+	free(old);
 
 	return ans;
 }
