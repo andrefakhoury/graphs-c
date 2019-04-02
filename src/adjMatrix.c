@@ -9,6 +9,7 @@
 /** Struct of a graph with adjacency Matrix */
 struct Graph {
 	void*** mat;
+
 	size_t nVertex, elemSize;
 	bool directed;
 };
@@ -218,7 +219,6 @@ bool graph_isBridge(Graph* g, int u, int v, Error* error) {
 		}
 	}
 
-
 	free(vis);
 
 	graph_addEdge(g, u, v, old, error);
@@ -342,4 +342,26 @@ void* graph_edgeWeight(Graph* g, int u, int v, Error* error) {
 	}
 
 	return g->mat[u][v];
+}
+
+bool graph_vertexIsUsed(Graph* g, int u, Error* error) {
+	//TODO: erro
+
+	int count = 0;
+	for (int i = 0; i < g->nVertex; i++) {
+		count += g->mat[u][i] != EMPTY;
+		count += g->mat[i][u] != EMPTY;
+	}
+
+	return count > 0;
+}
+
+bool graph_edgeIsSet(Graph* g, int u, int v, Error* error) {
+	//TODO: erro
+
+	bool ret = g->mat[u][v] != EMPTY;
+	if (g->directed)
+		ret |= g->mat[v][u] != EMPTY;
+
+	return ret;
 }

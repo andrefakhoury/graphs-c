@@ -5,7 +5,9 @@
 
 int main() {
 	Error error;
-	Graph* g = graph_create(5, sizeof(int), false, &error);
+	int n = 5;
+
+	Graph* g = graph_create(n, sizeof(int), false, &error);
 
 	int w;
 
@@ -16,12 +18,12 @@ int main() {
 	w = 5; graph_addEdge(g, 1, 4, &w, &error);
 	w = 6; graph_addEdge(g, 3, 4, &w, &error);
 
-	printf("%d\n", *(int*)graph_edgeWeight(g, 0, 1, &error));
-	printf("%d\n", *(int*)graph_edgeWeight(g, 0, 2, &error));
-	printf("%d\n", *(int*)graph_edgeWeight(g, 1, 2, &error));
-	printf("%d\n", *(int*)graph_edgeWeight(g, 1, 3, &error));
-	printf("%d\n", *(int*)graph_edgeWeight(g, 1, 4, &error));
-	printf("%d\n", *(int*)graph_edgeWeight(g, 3, 4, &error));
+	// printf("%d\n", *(int*)graph_edgeWeight(g, 0, 1, &error));
+	// printf("%d\n", *(int*)graph_edgeWeight(g, 0, 2, &error));
+	// printf("%d\n", *(int*)graph_edgeWeight(g, 1, 2, &error));
+	// printf("%d\n", *(int*)graph_edgeWeight(g, 1, 3, &error));
+	// printf("%d\n", *(int*)graph_edgeWeight(g, 1, 4, &error));
+	// printf("%d\n", *(int*)graph_edgeWeight(g, 3, 4, &error));
 
 	graph_destroy(g, &error);
 }
