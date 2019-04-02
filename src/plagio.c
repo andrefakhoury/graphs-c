@@ -93,13 +93,15 @@ int main(int argc, char* argv[]) {
 	char **str = malloc(qtt * sizeof(char*));
 
 	for (int i = 0; i < qtt1; i++) {
-		str[i] = malloc(sizeof(char*));
-		strcpy(str[i], str1[i]);
+		char* temp;
+		sscanf(str1[i], "%m[^\n]", &temp);
+		str[i] = temp;
 	}
 
 	for (int i = qtt1; i < qtt; i++) {
-		str[i] = malloc(sizeof(char*));
-		strcpy(str[i], str2[i - qtt1]);
+		char* temp;
+		sscanf(str2[i - qtt1], "%m[^\n]", &temp);
+		str[i] = temp;
 	}
 
 	qsort(str, qtt, sizeof(char*), cmpfunc);
