@@ -3,12 +3,14 @@
 #include <string.h>
 #include <ctype.h>
 
+#define STRMAX 256
+
 void clear_result() {
 	FILE *fp = fopen("result.txt", "w");
 	fclose(fp);
 }
 
-int count_slashes(char word[128]) {
+int count_slashes(char word[STRMAX]) {
 	int slash = 0;
 	
 	for(int i = 0; word[i] != '\0'; i++) 
@@ -17,7 +19,7 @@ int count_slashes(char word[128]) {
 	return slash;
 }
 
-int comma_count(char word[128]) {
+int comma_count(char word[STRMAX]) {
 	for(int i = 0; word[i] != '\0'; i++) {
 		if (word[i] == ',') return 1;
 	}
@@ -25,7 +27,7 @@ int comma_count(char word[128]) {
 	return 0;
 }
 
-int should_ignore(char w[128], int slash) {
+int should_ignore(char w[STRMAX], int slash) {
 	int size = strlen(w);
 
 	if (w[size-3] == 'P' && w[size-2] == 'N' && w[size-1] == 'M') return 0;
@@ -36,11 +38,11 @@ int should_ignore(char w[128], int slash) {
 	return ((w[size-3] == 'P' && w[size-2] == 'N' && w[size-1] == 'T') || (w[0] == '<' || w[0] == '\n'));
 }
 
-void parse(char word[128]) {
+void parse(char word[STRMAX], char dest[STRMAX]) {
 	int slash_count = count_slashes(word);
 	if (should_ignore(word, slash_count)) return;
 	
-	char to_write[128];
+	char to_write[STRMAX];
 	
 	if (slash_count < 2) {
 		sscanf(word, "%[^/]", to_write);
@@ -69,14 +71,23 @@ void parse(char word[128]) {
 	for (int i = 0; to_write[i]!='\0'; i++)
 		to_write[i] = tolower(to_write[i]);
 	
-	FILE *fp = fopen("result.txt", "a");
+	FILE *fp = fopen(dest, "a");
 	fprintf(fp, "%s\n", to_write);
 	fclose(fp);
 }
 
 int main() {
-	char word[128];
-	FILE *fp = fopen("exemplo.txt", "r");
+	char word[STRMAX];
+
+	char source[STRMAX], dest[STRMAX];
+
+	printf("Source: ");
+	scanf(" %s", source);
+
+	printf("\nDestine: ");
+	scanf(" %s", dest);
+
+	FILE *fp = fopen(source, "r");
 	int c;
 
 	clear_result();
@@ -85,6 +96,6 @@ int main() {
 
 	while ((c = fgetc(fp)) != EOF) {
 		fscanf(fp, "%s", word);
-		parse(word);
+		parse(word, dest);
 	}
 }

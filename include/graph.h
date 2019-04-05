@@ -40,8 +40,10 @@ void graph_eulerianCircuit(Graph* g, int** circuit, int* circuitSize, Error* err
 /** Returns a pointer to the weight of the edge u->v. */
 void* graph_edgeWeight(Graph* g, int u, int v, Error* error);
 
+/** Returns whether the vertex is connected to another one */
 bool graph_vertexIsUsed(Graph* g, int u, Error* error);
 
+/** Returns whether the edge u->v exists in the graph */
 bool graph_edgeIsSet(Graph* g, int u, int v, Error* error);
 
 #endif
