@@ -10,7 +10,7 @@ int main(int argc, char const *argv[]) {
 	int posXPM, posYPM; //Pac man's positions
 	int zero = 0;
 	Error error;
-	Graph* g = graph_create(5, sizeof(int), true , &error);
+	Graph* g = graph_create(GRID, sizeof(int), true , &error);
 
 	// Initializing the graph
 	graph_empty(g, &error);
@@ -19,16 +19,16 @@ int main(int argc, char const *argv[]) {
 	srand(time(NULL));
 
 	//Creating ghost's position
-	int posXG = rand()%5;
-	int posYG = rand()%5;
+	int posXG = rand()%GRID;
+	int posYG = rand()%GRID;
 
 	//Creating pac man's position
 	do {
-		posXPM = rand()%5;
+		posXPM = rand()%GRID;
 	} while (posXPM == posXG || posXPM == posXG+1 || posXPM == posXG-1);
 	
 	do {
-		posYPM = rand()%5;
+		posYPM = rand()%GRID;
 	} while (posYPM == posYG || posYPM == posYG+1 || posYPM == posYG-1);
 	
 	//Generating game flow

@@ -14,7 +14,7 @@ wave:
 	gcc src/adjMatrix.c src/queue.c src/wavefront.c src/pacman.c -I include/ -o main -Wall -std=c99 -g;
 
 run:
-	./main txt1 txt2
+	./main cases/txt1 cases/txt2
 
 debug:
 	gdb ./main

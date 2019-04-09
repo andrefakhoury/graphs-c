@@ -1,6 +1,8 @@
 #ifndef WAVEFRONT_H
 #define WAVEFRONT_H
 
+#define GRID 10
+
 /* Function that implements the wavefront method using BFS. */
 void graph_waveFront(Graph* g, int x, int y, Error* error);
 
