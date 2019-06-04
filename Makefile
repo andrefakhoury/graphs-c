@@ -5,13 +5,16 @@ fleury:
 	gcc src/adjMatrix.c src/fleury.c -I include/ -o main -Wall -std=c99 -g	
 
 plagio:
-	gcc src/adjMatrix.c src/plagio.c -I include/ -o main -Wall -std=c99 -g;
+	gcc src/adjMatrix.c src/plagio.c -I include/ -o main -Wall -std=c99 -g
 
 parser:
-	gcc src/adjMatrix.c src/parser.c -I include/ -o main -Wall -std=c99 -g;
+	gcc src/adjMatrix.c src/parser.c -I include/ -o main -Wall -std=c99 -g
 
 wave:
-	gcc src/adjMatrix.c src/queue.c src/wavefront.c src/pacman.c -I include/ -o main -Wall -std=c99 -g;
+	gcc src/adjMatrix.c src/queue.c src/wavefront.c src/pacman.c -I include/ -o main -Wall -std=c99 -g
+
+mst:
+	gcc src/adjMatrix.c src/mst.c -I include/ -o main -Wall -std=c99 -g
 
 run:
 	./main cases/txt1 cases/txt2
